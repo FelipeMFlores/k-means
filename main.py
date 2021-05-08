@@ -38,19 +38,20 @@ def calculate_centroids(clusters: dict):
 
     return pd.concat(centroids, axis=1).transpose()
 
-# TODO: olhar de novo como se calcula a dissimilaridade total intracluster, acho que nao é assim
+
 def average_within_cluster_distance(centroids: pd.DataFrame, clusters: dict):
-    avg = 0
-    # calculate the average within cluster distance between all instances
+    """
+    average_within_cluster_distance calculates the WSS.
+    The sum of the square distance of all the instances to its centroid.
+    """
+    sum = 0
     for i in clusters:
         cluster = pd.concat(clusters[i], axis=1).transpose()
-        sum = 0
         for _, row in cluster.iterrows():
-            sum += euclidean_dist(centroids.iloc[i], row)
-        avg += sum / len(clusters[i])
+            sum += euclidean_dist(centroids.iloc[i], row)**2
 
-    # return the average between the clusters
-    return avg / len(centroids)
+    # alternatively we can choose to divide the sum by k
+    return sum
 
 
 def k_means(df: pd.DataFrame, k: int, seed: int):
@@ -81,42 +82,55 @@ def k_means(df: pd.DataFrame, k: int, seed: int):
             break
         else:
             centroids = new_centroids
-    
+
     # calculate the average within distance between all clusters
     return average_within_cluster_distance(new_centroids, clusters)
 
 
-if __name__ == "__main__":
-    delimiter = '\t'
-    # concat all data except the socio demographic one
-    # TODO: o socio demographic nao é numerico e normalizado, nao sei se tem que ser usado para o k means
-    all_files = glob.glob(os.path.join(DADOS_DIR, "*.txt"))
-    df_from_each_file = (pd.read_csv(f, index_col=0, sep=delimiter)
-                         for f in all_files if SOCIO_DEMOGRAPHIC_FILE not in f)
-    df = pd.concat(df_from_each_file, axis=1)
-
-    # discover best seed for random initial centroids
-    # min = 99999999
-    # winner = -1
-    # for s in range(1, 100):
-    #     m = k_means(df, 5, s)
-    #     if m < min:
-    #         min = m
-    #         winner = s
-    #     print('seed ' + str(s) + ': ' + str(m))
-    # print('Seed Winner: ' + str(s))
-
-    # test k means with different K
+def try_different_k(df):
     results = []
-    for k in range (1, ):
+    for k in range(1, 13):
         m = k_means(df, k, SEED)
         results.append(m)
         print('k ' + str(k) + ': ' + str(m))
+    print(results)
+    return results
 
-    # plot results in graph
+
+def try_different_seeds(df, k):
+    """
+    try_different_seeds execute k mean changing the initial random centroids. 
+    """
+    min = 99999999
+    winner = -1
+    for s in range(1, 100):
+        m = k_means(df, k, s)
+        if m < min:
+            min = m
+            winner = s
+        print('seed ' + str(s) + ': ' + str(m))
+    print('Seed Winner: ' + str(winner))
+
+def plot_results(results):
     plt.plot(results)
     plt.plot(results, 'bo')
     plt.ylabel('Media intracluster')
     plt.xlabel('k centroides')
     plt.show()
 
+if __name__ == "__main__":
+    delimiter = '\t'
+    # concat all data except the socio demographic one
+    all_files = glob.glob(os.path.join(DADOS_DIR, "*.txt"))
+    df_from_each_file = (pd.read_csv(f, index_col=0, sep=delimiter)
+                         for f in all_files if SOCIO_DEMOGRAPHIC_FILE not in f)
+    df = pd.concat(df_from_each_file, axis=1)
+
+    # discover best seed for random initial centroids
+    # try_different_seeds(df, 6)
+
+    # test k means with different K
+    results = try_different_k(df)
+
+    # plot results in graph
+    plot_results(results)
