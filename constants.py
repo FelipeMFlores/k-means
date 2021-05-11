@@ -7,5 +7,5 @@ PHOBIAS_FILE = 'Phobias_Vars.txt'
 SOCIO_DEMOGRAPHIC_FILE = 'SocioDemographic_Vars.txt'
 SPENDING_HABITS_FILE = 'SpendingHabits_Vars.txt'
 
-SEED = 9
+SEED = 34
 DELIMITER = '\t'

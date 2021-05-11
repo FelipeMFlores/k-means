@@ -33,9 +33,10 @@ def try_different_seeds(df, k):
 
 
 def plot_results(results):
-    plt.plot(results)
-    plt.plot(results, 'bo')
-    plt.ylabel('Media intracluster')
+    x=list(range(1,len(results)+1))
+    plt.plot(x, results)
+    plt.plot(x, results, 'bo')
+    plt.ylabel('Distancia intracluster')
     plt.xlabel('k centroides')
     plt.show()
 
@@ -46,17 +47,20 @@ if __name__ == "__main__":
     df_from_each_file = (pd.read_csv(f, index_col=0, sep=DELIMITER)
                          for f in all_files if SOCIO_DEMOGRAPHIC_FILE not in f)
     df = pd.concat(df_from_each_file, axis=1)
-
-    k = 4
+    # df = df.filter(["Flying", "Storm", "Darkness", "Heights", "Spiders",
+    #                 "Snakes", "Rats", "Ageing", "Dangerous.dogs", "Fear.of.public.speaking"])
+    k = 6
     # discover best seed for random initial centroids
     # try_different_seeds(df, k)
+
 
     # test k means with different K
     # results = try_different_k(df)
     # # plot results in graph
+    
     # plot_results(results)
 
     # print hypothesis
     # phobia_age(df, k)
-    # phobia_child(df, k)
-    phobia_gender(df, k)
+    phobia_child(df, k)
+    # phobia_gender(df, k)

@@ -68,6 +68,8 @@ def k_means(df: pd.DataFrame, k: int, seed: int, return_clusters=False):
             break
         else:
             centroids = new_centroids
+    if i == 49:
+        print("STOP MARK!!")
 
     if return_clusters:
         return clusters, new_centroids
