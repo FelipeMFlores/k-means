@@ -1,4 +1,7 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import numpy as np
 from constants import *
 from kmeans import k_means
 
@@ -76,3 +79,28 @@ def phobia_gender(df: pd.DataFrame, k: int):
 
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):
         print(centroids)
+
+def spending_age(df: pd.DataFrame, k: int):
+    """
+    relation spending habits and age
+    plot the graph of clusters found
+    """
+    df_spending = df.filter(['Entertainment.spending', 'Spending.on.looks', 'Spending.on.gadgets'])
+    socio_df = pd.read_csv('dados/'+SOCIO_DEMOGRAPHIC_FILE, index_col=0, sep=DELIMITER)
+    # Calculates the average spending
+    df_spending['Spending.average'] = df.mean(axis=1)
+    df = pd.concat([socio_df['Age'], df_spending['Spending.average']], axis=1)
+
+    # Normalize the data
+    df=(df-df.min())/(df.max()-df.min())
+
+    colors = cm.rainbow(np.linspace(0, 1, k))
+
+    clusters, centroids = k_means(df, k, SEED, True)
+
+    for i in clusters:
+        cluster = pd.concat(clusters[i], axis=1).transpose()
+        plt.scatter(cluster['Age'].to_list(), cluster['Spending.average'].to_list(), color = colors[i])
+    plt.xlabel('Idade')
+    plt.ylabel('Gastos em média')
+    plt.savefig('results/economic_finances_k_{}.png'.format(k))
