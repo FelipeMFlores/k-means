@@ -49,7 +49,9 @@ if __name__ == "__main__":
     df = pd.concat(df_from_each_file, axis=1)
     # df = df.filter(["Flying", "Storm", "Darkness", "Heights", "Spiders",
     #                 "Snakes", "Rats", "Ageing", "Dangerous.dogs", "Fear.of.public.speaking"])
+    
     k = 6
+    
     # discover best seed for random initial centroids
     # try_different_seeds(df, k)
 
@@ -64,3 +66,4 @@ if __name__ == "__main__":
     # phobia_age(df, k)
     phobia_child(df, k)
     # phobia_gender(df, k)
+    # spending_age(df, k)
